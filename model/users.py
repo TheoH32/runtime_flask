@@ -1,93 +1,68 @@
-""" database dependencies to support sqliteDB examples """
-from random import randrange
-from datetime import date
-import os, base64
+"""
+These imports define the key object
+"""
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+"""
+These object and definitions are used throughout the Jupyter Notebook.
+"""
+
+# Setup of key Flask object (app)
+app = Flask(__name__)
+# Setup SQLAlchemy object and properties for the database (db)
+database = 'sqlite:///sqlite.db'  # path and filename of database
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = database
+app.config['SECRET_KEY'] = 'SECRET_KEY'
+db = SQLAlchemy()
+
+
+# This belongs in place where it runs once per project
+db.init_app(app)
+
+""" database dependencies to support sqlite examples """
+import datetime
+from datetime import datetime
 import json
 
-from __init__ import app, db
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-''' Tutorial: https://www.sqlalchemy.org/library.html#tutorials, try to get into Python shell and follow along '''
-
-# Define the Post class to manage actions in 'posts' table,  with a relationship to 'users' table
-class Post(db.Model):
-    __tablename__ = 'posts'
-
-    # Define the Notes schema
-    id = db.Column(db.Integer, primary_key=True)
-    note = db.Column(db.Text, unique=False, nullable=False)
-    image = db.Column(db.String, unique=False)
-    # Define a relationship in Notes Schema to userID who originates the note, many-to-one (many notes to one user)
-    userID = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    # Constructor of a Notes object, initializes of instance variables within object
-    def __init__(self, id, note, image):
-        self.userID = id
-        self.note = note
-        self.image = image
-
-    # Returns a string representation of the Notes object, similar to java toString()
-    # returns string
-    def __repr__(self):
-        return "Notes(" + str(self.id) + "," + self.note + "," + str(self.userID) + ")"
-
-    # CRUD create, adds a new record to the Notes table
-    # returns the object added or None in case of an error
-    def create(self):
-        try:
-            # creates a Notes object from Notes(db.Model) class, passes initializers
-            db.session.add(self)  # add prepares to persist person object to Notes table
-            db.session.commit()  # SqlAlchemy "unit of work pattern" requires a manual commit
-            return self
-        except IntegrityError:
-            db.session.remove()
-            return None
-
-    # CRUD read, returns dictionary representation of Notes object
-    # returns dictionary
-    def read(self):
-        # encode image
-        path = app.config['UPLOAD_FOLDER']
-        file = os.path.join(path, self.image)
-        file_text = open(file, 'rb')
-        file_read = file_text.read()
-        file_encode = base64.encodebytes(file_read)
-        
-        return {
-            "id": self.id,
-            "userID": self.userID,
-            "note": self.note,
-            "image": self.image,
-            "base64": str(file_encode)
-        }
-
+''' Tutorial: https://www.sqlalchemy.org/library.html#tutorials, try to get into a Python shell and follow along '''
 
 # Define the User class to manage actions in the 'users' table
 # -- Object Relational Mapping (ORM) is the key concept of SQLAlchemy
 # -- a.) db.Model is like an inner layer of the onion in ORM
 # -- b.) User represents data we want to store, something that is built on db.Model
 # -- c.) SQLAlchemy ORM is layer on top of SQLAlchemy Core, then SQLAlchemy engine, SQL
+
+
+# Defining the template for users, class definition template. Used to create objects for type user.
 class User(db.Model):
     __tablename__ = 'users'  # table name is plural, class name is singular
 
     # Define the User schema with "vars" from object
+    # Attributes used for future defined users
     id = db.Column(db.Integer, primary_key=True)
     _name = db.Column(db.String(255), unique=False, nullable=False)
     _uid = db.Column(db.String(255), unique=True, nullable=False)
     _password = db.Column(db.String(255), unique=False, nullable=False)
-    _dob = db.Column(db.Date)
-
-    # Defines a relationship between User record and Notes table, one-to-many (one user to many notes)
-    posts = db.relationship("Post", cascade='all, delete', backref='users', lazy=True)
+    _completedLessonOne = db.Column(db.Boolean, unique=False, nullable=False)
+    _completedQuiz = db.Column(db.Boolean, unique=False, nullable=False)
 
     # constructor of a User object, initializes the instance variables within object (self)
-    def __init__(self, name, uid, password="123qwerty", dob=date.today()):
+    # The constructed used to instantiate an object from our user class
+    def __init__(self, name, uid, completedQuiz, completedLessonOne, password="123qwerty"):
         self._name = name    # variables with self prefix become part of the object, 
         self._uid = uid
+        self.completedQuiz = completedQuiz
+        self.completedLessonOne = completedLessonOne
         self.set_password(password)
-        self._dob = dob
+        
+
 
     # a name getter method, extracts name from object
     @property
@@ -99,12 +74,12 @@ class User(db.Model):
     def name(self, name):
         self._name = name
     
-    # a getter method, extracts email from object
+    # a getter method, extracts uid from object
     @property
     def uid(self):
         return self._uid
     
-    # a setter function, allows name to be updated after initial object creation
+    # a setter function, allows uid to be updated after initial object creation
     @uid.setter
     def uid(self, uid):
         self._uid = uid
@@ -112,39 +87,44 @@ class User(db.Model):
     # check if uid parameter matches user id in object, return boolean
     def is_uid(self, uid):
         return self._uid == uid
+
+    # completedQuiz getter
+    @property
+    def completedQuiz(self):
+        return self._completedQuiz
+    
+    # completedQuiz setter
+    @completedQuiz.setter
+    def completedQuiz(self, completedQuiz):
+        self._completedQuiz = completedQuiz
+
+    # completedLessonOne getter
+    @property
+    def completedLessonOne(self):
+        return self._completedLessonOne
+    
+    # completedLessonOne setter
+    @completedLessonOne.setter
+    def completedLessonOne(self, completedLessonOne):
+        self._completedLessonOne = completedLessonOne
     
     @property
     def password(self):
         return self._password[0:10] + "..." # because of security only show 1st characters
 
-    # update password, this is conventional setter
+    # update password, this is conventional method used for setter
     def set_password(self, password):
         """Create a hashed password."""
         self._password = generate_password_hash(password, method='sha256')
 
-    # check password parameter versus stored/encrypted password
+    # check password parameter against stored/encrypted password
     def is_password(self, password):
         """Check against hashed password."""
         result = check_password_hash(self._password, password)
         return result
+       
     
-    # dob property is returned as string, to avoid unfriendly outcomes
-    @property
-    def dob(self):
-        dob_string = self._dob.strftime('%m-%d-%Y')
-        return dob_string
-    
-    # dob should be have verification for type date
-    @dob.setter
-    def dob(self, dob):
-        self._dob = dob
-    
-    @property
-    def age(self):
-        today = date.today()
-        return today.year - self._dob.year - ((today.month, today.day) < (self._dob.month, self._dob.day))
-    
-    # output content using str(object) in human readable form, uses getter
+    # output content using str(object) is in human readable form
     # output content using json dumps, this is ready for API response
     def __str__(self):
         return json.dumps(self.read())
@@ -168,14 +148,13 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "uid": self.uid,
-            "dob": self.dob,
-            "age": self.age,
-            "posts": [post.read() for post in self.posts]
+            "completedQuiz": self.completedQuiz,
+            "completedLessonOne": self.completedLessonOne
         }
 
     # CRUD update: updates user name, password, phone
     # returns self
-    def update(self, name="", uid="", password=""):
+    def update(self, name="", uid="", password="", completedQuiz=False, completedLessonOne=False):
         """only updates values with length"""
         if len(name) > 0:
             self.name = name
@@ -183,6 +162,16 @@ class User(db.Model):
             self.uid = uid
         if len(password) > 0:
             self.set_password(password)
+        if completedQuiz == True:
+            self.completedQuiz = True
+        else:
+            self.completedQuiz = False
+        if completedLessonOne == True:
+            self.completedLessonOne = True
+        else:
+            self.completedLessonOne = False
+
+        db.session.add(self) # performs update when id exists\n",
         db.session.commit()
         return self
 
@@ -192,36 +181,35 @@ class User(db.Model):
         db.session.delete(self)
         db.session.commit()
         return None
-
+       
 
 """Database Creation and Testing """
 
 
-# Builds working data for testing
+# Builds working user data
 def initUsers():
     with app.app_context():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
-        u1 = User(name='Thomas Edison', uid='toby', password='123toby', dob=date(1847, 2, 11))
-        u2 = User(name='Nicholas Tesla', uid='niko', password='123niko')
-        u3 = User(name='Alexander Graham Bell', uid='lex', password='123lex')
-        u4 = User(name='Eli Whitney', uid='whit', password='123whit')
-        u5 = User(name='John Mortensen', uid='jm1021', dob=date(1959, 10, 21))
+        u1 = User(name='Theo H', uid='TheoH32', password='theo131!', completedQuiz=False, completedLessonOne=False)
+        u2 = User(name='Alexa C', uid='littelex', password='pumpkin868', completedQuiz=False, completedLessonOne=False)
+        u3 = User(name='Ava C', uid='spiderman', password='apple234', completedQuiz=False, completedLessonOne=False)
+        u4 = User(name='Samarth K', uid='chesslover', password='broccoli199', completedQuiz=False, completedLessonOne=False)
+        u5 = User(name='Ananya G', uid='ananya123', password='orange346', completedQuiz=False, completedLessonOne=False)
+        u6 = User(name='Haseeb B', uid='haseebtheman', password='carrot135', completedQuiz=False, completedLessonOne=False)
 
-        users = [u1, u2, u3, u4, u5]
+        users = [u1, u2, u3, u4, u5, u6]
+
 
         """Builds sample user/note(s) data"""
         for user in users:
             try:
-                '''add a few 1 to 4 notes per user'''
-                for num in range(randrange(1, 4)):
-                    note = "#### " + user.name + " note " + str(num) + ". \n Generated by test data."
-                    user.posts.append(Post(id=user.id, note=note, image='ncs_logo.png'))
-                '''add user/post data to table'''
-                user.create()
-            except IntegrityError:
+                '''add user to table'''
+                object = user.create()
+                print(f"Created new uid {object.uid}")
+            except:  # error raised if object nit created
                 '''fails with bad or duplicate data'''
-                db.session.remove()
-                print(f"Records exist, duplicate email, or error: {user.uid}")
-            
+                print(f"Records exist uid {user.uid}, or error.")
+                
+initUsers()
