@@ -4,7 +4,7 @@ services:
                 image: runtime_terror_v1
                 build: .
                 ports:
-                        - "8144:8086"
+                        - "8032:8032"
                 volumes:
                         - ./volumes:/volumes
                         - ./instance:/instance
