@@ -1,0 +1,11 @@
+version: '3'
+services:
+        web:
+                image: runtime_terror_v1
+                build: .
+                ports:
+                        - "8144:8086"
+                volumes:
+                        - ./volumes:/volumes
+                        - ./instance:/instance
+                restart: unless-stopped
