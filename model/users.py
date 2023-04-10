@@ -50,16 +50,12 @@ class User(db.Model):
     _name = db.Column(db.String(255), unique=False, nullable=False)
     _uid = db.Column(db.String(255), unique=True, nullable=False)
     _password = db.Column(db.String(255), unique=False, nullable=False)
-    _completedLessonOne = db.Column(db.Boolean, unique=False, nullable=False)
-    _completedQuiz = db.Column(db.Boolean, unique=False, nullable=False)
 
     # constructor of a User object, initializes the instance variables within object (self)
     # The constructed used to instantiate an object from our user class
-    def __init__(self, name, uid, completedQuiz, completedLessonOne, password="123qwerty"):
+    def __init__(self, name, uid, password="123qwerty"):
         self._name = name    # variables with self prefix become part of the object, 
         self._uid = uid
-        self._completedQuiz = completedQuiz
-        self._completedLessonOne = completedLessonOne
         self.set_password(password)
         
 
@@ -87,26 +83,6 @@ class User(db.Model):
     # check if uid parameter matches user id in object, return boolean
     def is_uid(self, uid):
         return self._uid == uid
-
-    # completedQuiz getter
-    @property
-    def completedQuiz(self):
-        return self._completedQuiz
-    
-    # completedQuiz setter
-    @completedQuiz.setter
-    def completedQuiz(self, completedQuiz):
-        self._completedQuiz = completedQuiz
-
-    # completedLessonOne getter
-    @property
-    def completedLessonOne(self):
-        return self._completedLessonOne
-    
-    # completedLessonOne setter
-    @completedLessonOne.setter
-    def completedLessonOne(self, completedLessonOne):
-        self._completedLessonOne = completedLessonOne
     
     @property
     def password(self):
@@ -147,14 +123,12 @@ class User(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "uid": self.uid,
-            "completedQuiz": self.completedQuiz,
-            "completedLessonOne": self.completedLessonOne
+            "uid": self.uid
         }
 
     # CRUD update: updates user name, password, phone
     # returns self
-    def update(self, name="", uid="", password="", completedQuiz=False, completedLessonOne=False):
+    def update(self, name="", uid="", password=""):
         """only updates values with length"""
         if len(name) > 0:
             self.name = name
@@ -162,15 +136,6 @@ class User(db.Model):
             self.uid = uid
         if len(password) > 0:
             self.set_password(password)
-        if completedQuiz == True:
-            self.completedQuiz = True
-        else:
-            self.completedQuiz = False
-        if completedLessonOne == True:
-            self.completedLessonOne = True
-        else:
-            self.completedLessonOne = False
-
         db.session.add(self) # performs update when id exists\n",
         db.session.commit()
         return self
@@ -192,12 +157,12 @@ def initUsers():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
-        u1 = User(name='Theo H', uid='TheoH32', password='theo131!', completedQuiz=False, completedLessonOne=False)
-        u2 = User(name='Alexa C', uid='littelex', password='pumpkin868', completedQuiz=False, completedLessonOne=False)
-        u3 = User(name='Ava C', uid='spiderman', password='apple234', completedQuiz=False, completedLessonOne=False)
-        u4 = User(name='Samarth K', uid='chesslover', password='broccoli199', completedQuiz=False, completedLessonOne=False)
-        u5 = User(name='Ananya G', uid='ananya123', password='orange346', completedQuiz=False, completedLessonOne=False)
-        u6 = User(name='Haseeb B', uid='haseebtheman', password='carrot135', completedQuiz=False, completedLessonOne=False)
+        u1 = User(name='Theo H', uid='TheoH32', password='theo131!')
+        u2 = User(name='Alexa C', uid='littelex', password='pumpkin868')
+        u3 = User(name='Ava C', uid='spiderman', password='apple234')
+        u4 = User(name='Samarth K', uid='chesslover', password='broccoli199')
+        u5 = User(name='Ananya G', uid='ananya123', password='orange346')
+        u6 = User(name='Haseeb B', uid='haseebtheman', password='carrot135')
 
         users = [u1, u2, u3, u4, u5, u6]
 
