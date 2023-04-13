@@ -128,12 +128,12 @@ def initUsers():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
-        u1 = User(name='Theo H', uid='TheoH32', password='theo131!', completedQuiz=False, completedLessonOne=False)
-        u2 = User(name='Alexa C', uid='littelex', password='pumpkin868', completedQuiz=False, completedLessonOne=False)
-        u3 = User(name='Ava C', uid='spiderman', password='apple234', completedQuiz=False, completedLessonOne=False)
-        u4 = User(name='Samarth K', uid='chesslover', password='broccoli199', completedQuiz=False, completedLessonOne=False)
-        u5 = User(name='Ananya G', uid='ananya123', password='orange346', completedQuiz=False, completedLessonOne=False)
-        u6 = User(name='Haseeb B', uid='haseebtheman', password='carrot135', completedQuiz=False, completedLessonOne=False)
+        u1 = User(name='Theo H', uid='TheoH32', password='theo131!')
+        u2 = User(name='Alexa C', uid='littelex', password='pumpkin868')
+        u3 = User(name='Ava C', uid='spiderman', password='apple234')
+        u4 = User(name='Samarth K', uid='chesslover', password='broccoli199')
+        u5 = User(name='Ananya G', uid='ananya123', password='orange346')
+        u6 = User(name='Haseeb B', uid='haseebtheman', password='carrot135')
 
         users = [u1, u2, u3, u4, u5, u6]
 
