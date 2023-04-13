@@ -155,6 +155,7 @@ class User(db.Model):
 def initUsers():
     with app.app_context():
         """Create database and tables"""
+        db.init_app(app)
         db.create_all()
         """Tester data for table"""
         u1 = User(name='Theo H', uid='TheoH32', password='theo131!')
