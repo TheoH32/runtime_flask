@@ -1,17 +1,35 @@
-""" database dependencies to support sqliteDB examples """
-from random import randrange
-from datetime import date
-import os, base64
+"""
+These imports define the key object
+"""
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+"""
+These object and definitions are used throughout the Jupyter Notebook.
+"""
+
+# Setup of key Flask object (app)
+app = Flask(__name__)
+# Setup SQLAlchemy object and properties for the database (db)
+database = 'sqlite:///sqlite.db'  # path and filename of database
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = database
+app.config['SECRET_KEY'] = 'SECRET_KEY'
+db = SQLAlchemy()
+
+
+# This belongs in place where it runs once per project
+db.init_app(app)
+
+""" database dependencies to support sqlite examples """
+import datetime
+from datetime import datetime
 import json
 
-from __init__ import app, db
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
-''' Tutorial: https://www.sqlalchemy.org/library.html#tutorials, try to get into Python shell and follow along '''
-
-# Define the Post class to manage actions in 'posts' table,  with a relationship to 'users' table
 
 # Define the User class to manage actions in the 'users' table
 # -- Object Relational Mapping (ORM) is the key concept of SQLAlchemy
@@ -146,4 +164,6 @@ def initUsers():
                 '''fails with bad or duplicate data'''
                 db.session.remove()
                 print(f"Records exist, duplicate email, or error: {user.uid}")
+
+initUsers()
             
