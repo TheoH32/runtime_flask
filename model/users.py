@@ -135,7 +135,7 @@ def initUsers():
         u5 = User(name='Ananya G', uid='ananya123', password='orange346', completedQuiz=False, completedLessonOne=False)
         u6 = User(name='Haseeb B', uid='haseebtheman', password='carrot135', completedQuiz=False, completedLessonOne=False)
 
-        users = [u1, u2, u3, u4, u5]
+        users = [u1, u2, u3, u4, u5, u6]
 
         """Builds sample user/note(s) data"""
         for user in users:
