@@ -1,13 +1,12 @@
-"""
-These imports define the key object
-"""
-
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import json
-
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+"""
+These object and definitions are used throughout the Jupyter Notebook.
+"""
 
 # Setup of key Flask object (app)
 app = Flask(__name__)
@@ -17,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = database
 app.config['SECRET_KEY'] = 'SECRET_KEY'
 db = SQLAlchemy()
+
 db.init_app(app)
 
 class User(db.Model):
