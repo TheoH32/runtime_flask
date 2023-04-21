@@ -7,5 +7,3 @@ flask_sqlalchemy
 flask_migrate
 flask_restful
 flask_cors
-fastapi==0.95.*
-uvicorn[standard]==0.21.*
